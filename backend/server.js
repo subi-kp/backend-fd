@@ -9,9 +9,7 @@ var fs = require('fs');
 var util = require('util');
 var log_file = fs.createWriteStream(__dirname + '/debug.log', {flags : 'w'});
 var log_stdout = process.stdout;
-var username = 'st2admin';
-var password = 'Xome@1234';
-var auth = 'Basic ' + new Buffer(username + ':' + password).toString('base64');
+var dictionary = [{key:"payment", value:"payment-api"},{key:"login", value:"login-api"}];
 console.log = function(d) { //
   log_file.write(util.format(d) + '\n');
   log_stdout.write(util.format(d) + '\n');
@@ -26,14 +24,29 @@ console.log('Server started! At http://localhost:' + port);
 
 app.post('/api/get', function(req, res) {
     var args = req.body;
-
+var subject = args['data']['ticket']['subject'];
 console.log(args);
-    
+for (var i=0; i < dictionary.length; i++)
+
+                                {
+                                       if ( subject.indexOf(dictionary[i].key)> -1)
+                                                {
+
+                                                        webhook= 'https://54.255.245.156/api/v1/webhooks/' + dictionary[i].value;
+console.log(webhook);
+break;
+}
+else
+{
+ webhook= 'https://54.255.245.156/api/v1/webhooks/test'
+console.log(webhook);
+}
+}   
     async.parallel([
 		function(callback) {
 			var options = {
 				method: 'POST',
-				url: 'https://54.255.245.156/api/v1/webhooks/test',
+				url: webhook,
 				headers: {
 					'cache-control': 'no-cache',
 					'content-type': 'application/json',
